@@ -1,0 +1,9 @@
+{
+	"name": "adf-movie-analysis",
+	"location": "eastus2",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "9d7baae1-b17a-41f3-96f2-06979b5f8da8",
+		"tenantId": "53e09fbc-f1c8-469e-833a-2c0ab52dbb97"
+	}
+}
