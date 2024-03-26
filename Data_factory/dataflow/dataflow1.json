@@ -1,0 +1,90 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_movie_metadata",
+						"type": "DatasetReference"
+					},
+					"name": "srcMovieMetadata"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "selectReqColumns"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "flatten1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          adult as string,",
+				"          belongs_to_collection as string,",
+				"          budget as integer,",
+				"          genres as string,",
+				"          homepage as string,",
+				"          id as integer,",
+				"          imdb_id as string,",
+				"          original_language as string,",
+				"          original_title as string,",
+				"          overview as string,",
+				"          popularity as double,",
+				"          poster_path as string,",
+				"          production_companies as string,",
+				"          production_countries as string,",
+				"          release_date as date,",
+				"          revenue as long,",
+				"          runtime as double,",
+				"          spoken_languages as string,",
+				"          status as string,",
+				"          tagline as string,",
+				"          title as string,",
+				"          video as string,",
+				"          vote_average as double,",
+				"          vote_count as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> srcMovieMetadata",
+				"srcMovieMetadata select(mapColumn(",
+				"          id,",
+				"          belongs_to_collection,",
+				"          tagline,",
+				"          genres,",
+				"          title = original_title,",
+				"          imdb_id,",
+				"          original_language,",
+				"          spoken_languages,",
+				"          runtime,",
+				"          popularity,",
+				"          budget,",
+				"          revenue,",
+				"          vote_average,",
+				"          vote_count,",
+				"          release_date,",
+				"          production_companies,",
+				"          production_countries",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectReqColumns",
+				"selectReqColumns derive(genres = flatten(split(replace(replace(genres, '[', ''), ']', ''), \",\")),",
+				"          production_countries = replace(replace(production_countries, '[', '{'), ']', '}'),",
+				"          spoken_languages = replace(replace(spoken_languages, '[', '{'), ']', '}')) ~> derivedColumn1",
+				"derivedColumn1 foldDown(unroll(genres, genres),",
+				"     mapColumn(",
+				"          genres_id = genres",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> flatten1"
+			]
+		}
+	}
+}
